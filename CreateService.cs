@@ -11,24 +11,22 @@ using Microsoft.Azure.Cosmos.Table;
 
 namespace Rasputin.TM
 {
-    public static class CreateSlot
+    public static class CreateService
     {
-        [FunctionName("CreateSlot")]
+        [FunctionName("CreateService")]
         public static async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req,
-                                                    [Table("tblSlots")] CloudTable tblSlot,
+                                                    [Table("tblServices")] CloudTable tblService,
                                                     ILogger log)
         {
-            log.LogInformation("CreateSlot called");
+            log.LogInformation("CreateService called");
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             dynamic data = JsonConvert.DeserializeObject(requestBody);
-            DateTime timeslot = data?.timeslot;
-            Guid userID = data?.userID;
-            Guid[] serviceIDs = data?.serviceIDs;
+            string name = data?.name;
 
-            Slot Slot = await new SlotService().InsertSlot(log, tblSlot, timeslot, userID, serviceIDs);
+            Service Service = await new ServiceService().InsertService(log, tblService, name);
 
-            string responseMessage = JsonConvert.SerializeObject(Slot);
+            string responseMessage = JsonConvert.SerializeObject(Service);
             return new OkObjectResult(responseMessage);
         }
     }
